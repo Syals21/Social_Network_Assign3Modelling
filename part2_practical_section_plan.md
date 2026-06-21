@@ -79,10 +79,10 @@ Use a random network.
 
 Recommended approach:
 
-- Use Python with `networkx`.
-- Create a random network for citizen-citizen connections.
-- Add influencer-citizen links with higher degree than normal citizens.
-- Add expert-citizen links with moderate degree but higher trust.
+- Use GNU Octave adjacency matrices.
+- Create a random `N x N` matrix for citizen-citizen connections.
+- Create an `N x I` matrix for influencer-citizen links with higher degree than normal citizens.
+- Create an `N x E` matrix for expert-citizen links with moderate degree but higher trust.
 
 Suggested network settings:
 
@@ -284,15 +284,13 @@ The model must produce:
 - Network visualization, optional but recommended
 - Short explanation of findings
 
-Recommended Python libraries:
+Recommended tools:
 
-- `numpy` for calculations
-- `pandas` for results tables
-- `networkx` for random network construction
-- `matplotlib` for 2D, 3D, and histogram plots
-- `tkinter`, `streamlit`, or `gradio` for GUI
-
-For a simple assignment-friendly GUI, use `tkinter` if no web interface is needed. Use `streamlit` if the group wants a cleaner interactive dashboard.
+- GNU Octave for the ABM simulation engine.
+- Octave matrix operations for opinions, trust, and network adjacency.
+- Octave `csvwrite` or `dlmwrite` for exporting simulation results.
+- HTML, CSS, and JavaScript for the GUI.
+- Plotly.js or Chart.js for 2D/3D plots and histograms inside the HTML GUI.
 
 ## Analysis Questions to Answer in the Report
 
@@ -312,92 +310,378 @@ Then answer these overall questions:
 
 ## Three-Person Task Division
 
-### Person 1: Model Design and Core Simulation
+### Person 1: Octave ABM Engine and Scenario Simulation
 
 Main responsibility:
 
-- Build the ABM engine.
+- Build the full ABM simulation engine using GNU Octave.
+- Produce clean result files that Person 2 can load into the HTML GUI and Person 3 can use for analysis.
 
 Tasks:
 
-- Define agents and parameters.
-- Implement random network generation.
-- Implement opinion update rules.
-- Implement all four scenarios.
-- Store simulation results for every time step.
-- Make sure opinions stay inside `[-1, +1]`.
-
-Deliverables:
-
-- Core Python simulation file.
-- Scenario parameter settings.
-- Saved raw results for all scenarios.
-
-Suggested files:
+- Create the main Octave file `main.m`.
+- Create a configuration file or function called `scenario_config.m`.
+- Use matrices/vectors instead of complicated object-oriented code because Octave works well with matrix calculations.
+- Represent citizen opinions as a vector:
 
 ```text
-simulation.py
-model_config.py
+O_citizens = N x 1 vector
+```
+
+- Represent influencer opinions as a vector:
+
+```text
+O_influencers = I x 1 vector
+```
+
+- Represent expert opinions as a vector:
+
+```text
+O_experts = E x 1 vector
+```
+
+- Represent the random social network using adjacency matrices:
+
+```text
+A_cc = N x N citizen-to-citizen network
+A_ci = N x I citizen-to-influencer network
+A_ce = N x E citizen-to-expert network
+```
+
+- Represent trust using matrices:
+
+```text
+T_cc = N x N citizen trust toward citizens
+T_ci = N x I citizen trust toward influencers
+T_ce = N x E citizen trust toward experts
+```
+
+- Initialize:
+  - `N = 100` citizens
+  - `I = 5` influencers
+  - `E = 3` education experts
+  - `time_steps = 75`
+  - Citizen opinions randomly between `-1` and `+1`
+  - Influencer opinions using stronger values, for example some near `+0.8` and some near `-0.8`
+  - Expert opinions near neutral or moderately supportive, for example `0.2` to `0.5`
+
+- Build the random network:
+  - Citizen-citizen links: random probability around `0.05` to `0.10`
+  - Influencer-citizen links: higher connection rate, around `0.30` to `0.60`
+  - Expert-citizen links: moderate connection rate, around `0.20` to `0.40`
+  - Remove self-links from `A_cc`
+
+- Implement the opinion update equation for every citizen:
+
+```text
+O_i(t+1) = O_i(t)
+           + direct_effect
+           + average_effect
+           + expert_effect
+           + influencer_effect
+```
+
+- Calculate the effects in Octave:
+
+```text
+average_effect = beta * (mean_neighbour_opinion - O_i)
+expert_effect = gamma * trust_expert * (mean_expert_opinion - O_i)
+influencer_effect = delta * trust_influencer * influencer_strength * (mean_influencer_opinion - O_i)
+```
+
+- Clip all updated opinions so they remain inside `[-1, +1]`:
+
+```octave
+O_new = max(-1, min(1, O_new));
+```
+
+- Store the result at every time step:
+
+```text
+opinion_history = time_steps x N matrix
+average_history = time_steps x 1 vector
+```
+
+- Implement all four scenarios:
+  - `baseline`
+  - `strong_influencer`
+  - `strong_expert`
+  - `low_trust`
+
+- For each scenario, export files:
+  - Individual opinion history
+  - Average opinion over time
+  - Final opinions
+  - Summary statistics
+  - Network adjacency data if needed for visualization
+
+Suggested Octave function structure:
+
+```text
+main.m
+  calls run_all_scenarios()
+
+scenario_config.m
+  returns parameter values for each scenario
+
+initialize_agents.m
+  creates initial opinions and influence values
+
+build_network.m
+  creates A_cc, A_ci, A_ce, T_cc, T_ci, T_ce
+
+run_simulation.m
+  loops through time and updates opinions
+
+classify_result.m
+  calculates mean, standard deviation, and basic classification
+
+export_results.m
+  saves CSV files for the HTML GUI and report
+```
+
+Minimum CSV outputs for each scenario:
+
+```text
+results/baseline_opinion_history.csv
+results/baseline_average_history.csv
+results/baseline_final_opinions.csv
+results/strong_influencer_opinion_history.csv
+results/strong_influencer_average_history.csv
+results/strong_influencer_final_opinions.csv
+results/strong_expert_opinion_history.csv
+results/strong_expert_average_history.csv
+results/strong_expert_final_opinions.csv
+results/low_trust_opinion_history.csv
+results/low_trust_average_history.csv
+results/low_trust_final_opinions.csv
 results/scenario_summary.csv
 ```
 
-### Person 2: GUI, Visualizations, and Experiment Output
-
-Main responsibility:
-
-- Build the interactive system and produce required plots.
-
-Tasks:
-
-- Create the GUI.
-- Add controls for scenario and parameters.
-- Connect GUI to the simulation function.
-- Generate 2D average opinion plots.
-- Generate individual opinion temporal plots.
-- Generate 3D temporal plots.
-- Generate final opinion histograms.
-- Optional: create network visualization.
-
-Deliverables:
-
-- GUI file or dashboard file.
-- All required graphs.
-- Visual result folder.
-
-Suggested files:
+`scenario_summary.csv` should include:
 
 ```text
-app.py
-plotting.py
-results/*.png
+scenario,final_mean,final_std,final_min,final_max,classification
 ```
 
-### Person 3: Analysis, Report, and Final Packaging
-
-Main responsibility:
-
-- Interpret results and prepare final submission.
-
-Tasks:
-
-- Create result tables from scenario outputs.
-- Classify each scenario as consensus, polarization, fragmentation, echo chamber, or mixed.
-- Answer all analysis questions.
-- Write the 2-5 page report.
-- Check that equations and model design are clearly explained.
-- Prepare final submission folder.
-
 Deliverables:
 
-- Short report.
-- Analysis table.
-- Final checklist.
+- Working Octave ABM engine.
+- Four scenario simulations.
+- CSV result files for Person 2 and Person 3.
+- Short notes explaining the model parameters and equations.
 
 Suggested files:
 
 ```text
-report.docx or report.pdf
-analysis_summary.md
+code/main.m
+code/scenario_config.m
+code/initialize_agents.m
+code/build_network.m
+code/run_simulation.m
+code/classify_result.m
+code/export_results.m
+results/scenario_summary.csv
+```
+
+### Person 2: HTML GUI, Visualizations, and Experiment Display
+
+Main responsibility:
+
+- Build a functional HTML-based GUI that displays the Octave simulation results.
+- The GUI does not need to run Octave directly. It can load the CSV files exported by Person 1.
+
+Tasks:
+
+- Create `index.html`, `style.css`, and `app.js`.
+- Design the first screen as the actual simulation dashboard, not a landing page.
+- Add a scenario selector with four options:
+  - Baseline Model
+  - Strong Influencer Impact
+  - Strong Expert Intervention
+  - Low Trust Environment
+- Add a file-loading method for CSV data. Use either:
+  - Option A: Place all CSV files in a `results/` folder and load them using JavaScript `fetch()` when running through a local server.
+  - Option B: Add file input controls so the user can upload the CSV files manually in the browser.
+- Recommended simple method: use Option B if the lecturer will open the HTML file directly without a server.
+- Use JavaScript to parse CSV files into arrays.
+- Display the selected scenario's:
+  - Average opinion over time
+  - Individual citizen opinions over time
+  - 3D temporal plot
+  - Final opinion histogram
+  - Summary statistics and classification
+
+Required GUI sections:
+
+- Header/title: `Opinion Dynamics ABM: AI Learning Assistants`
+- Scenario selector
+- CSV upload area or data loading buttons
+- Summary panel showing:
+  - Final mean opinion
+  - Final standard deviation
+  - Minimum opinion
+  - Maximum opinion
+  - Classification
+- Plot area for:
+  - 2D average opinion line plot
+  - 2D individual opinion temporal plot
+  - 3D opinion surface/scatter plot
+  - Final opinion histogram
+- Short findings box where the result explanation can be shown for the selected scenario
+
+Recommended plotting library:
+
+- Use Plotly.js because it supports 2D line plots, 3D plots, and histograms in one library.
+
+Suggested HTML/JS file structure:
+
+```text
+gui/index.html
+gui/style.css
+gui/app.js
+gui/lib/plotly.min.js
+```
+
+Suggested JavaScript functions:
+
+```text
+loadScenarioData(scenarioName)
+parseCSV(text)
+drawAveragePlot(averageHistory)
+drawIndividualPlot(opinionHistory)
+draw3DTemporalPlot(opinionHistory)
+drawHistogram(finalOpinions)
+updateSummary(summaryRow)
+updateFindingsText(scenarioName, summaryRow)
+```
+
+Suggested plot details:
+
+- Average opinion plot:
+  - x-axis = time step
+  - y-axis = average opinion
+  - y-range = `[-1, +1]`
+
+- Individual opinion plot:
+  - x-axis = time step
+  - y-axis = opinion
+  - one faint line for each citizen
+  - y-range = `[-1, +1]`
+
+- 3D temporal plot:
+  - x-axis = time step
+  - y-axis = citizen ID
+  - z-axis = opinion
+
+- Histogram:
+  - x-axis = final opinion
+  - bins from `-1` to `+1`
+  - y-axis = number of citizens
+
+GUI requirements:
+
+- Must be readable on a laptop screen.
+- Must include clear labels and legends.
+- Must allow switching between all four scenarios.
+- Must show the classification result for each scenario.
+- Must work using the CSV output format from Person 1.
+
+Deliverables:
+
+- Functional HTML GUI.
+- JavaScript code that loads/parses result CSV files.
+- 2D and 3D plots inside the GUI.
+- Screenshots of each scenario's plots for the report.
+
+Suggested files:
+
+```text
+gui/index.html
+gui/style.css
+gui/app.js
+gui/screenshots/baseline_dashboard.png
+gui/screenshots/strong_influencer_dashboard.png
+gui/screenshots/strong_expert_dashboard.png
+gui/screenshots/low_trust_dashboard.png
+```
+
+### Person 3: Analysis, Report Writing, and Final Packaging
+
+Main responsibility:
+
+- Interpret the simulation results, answer the assignment analysis questions, and prepare the final submission package.
+
+Tasks:
+
+- Read `results/scenario_summary.csv` from Person 1.
+- Review the GUI plots and screenshots from Person 2.
+- Create a scenario comparison table with:
+  - Scenario name
+  - Final average opinion
+  - Final standard deviation
+  - Minimum opinion
+  - Maximum opinion
+  - Classification
+  - Main interpretation
+- Classify each scenario as one of:
+  - Consensus
+  - Polarization
+  - Fragmentation
+  - Echo chamber
+  - Mixed or neutral
+- Write the 2-5 page report.
+- Include the Octave model design:
+  - Citizen agents
+  - Influencer agents
+  - Expert agents
+  - Random network structure
+  - Trust matrices
+  - Opinion range `[-1, +1]`
+- Include the core equations:
+  - Direct influence
+  - Averaging effect
+  - Expert effect
+  - Influencer effect
+  - Final opinion update equation
+- Include experiment settings:
+  - Number of citizens
+  - Number of influencers
+  - Number of experts
+  - Time steps
+  - Parameter changes for the four scenarios
+- Include results:
+  - At least one plot or screenshot per scenario
+  - Scenario comparison table
+  - Short explanation of what happened in each scenario
+- Answer the required analysis questions:
+  - Whether each scenario shows consensus, polarization, fragmentation, or echo chambers
+  - Impact of citizens, influencers, and experts
+  - System stability
+  - Whether small numbers of influencers can dominate opinion
+  - Whether expert influence always creates consensus
+  - What happens when averaging effect is strong
+  - Whether trust, experts, or network structure is most important in preventing polarization
+  - How policymakers should use education experts to stabilize public opinion
+- Prepare the final folder for submission.
+- Check that file names are clear and that the code can run.
+- Write a short `README.md` explaining how to run:
+  - The Octave simulation
+  - The HTML GUI
+
+Deliverables:
+
+- Final 2-5 page report.
+- Analysis summary table.
+- Final submission folder.
+- README/run instructions.
+
+Suggested files:
+
+```text
+report/Assignment03_Report.docx or report/Assignment03_Report.pdf
+report/analysis_summary.md
+README.md
 submission_checklist.md
 ```
 
@@ -406,18 +690,37 @@ submission_checklist.md
 ```text
 Assignment03_Practical/
   code/
-    simulation.py
-    plotting.py
-    app.py
-    model_config.py
+    main.m
+    scenario_config.m
+    initialize_agents.m
+    build_network.m
+    run_simulation.m
+    classify_result.m
+    export_results.m
+  gui/
+    index.html
+    style.css
+    app.js
+    lib/
+      plotly.min.js
+    screenshots/
+      baseline_dashboard.png
+      strong_influencer_dashboard.png
+      strong_expert_dashboard.png
+      low_trust_dashboard.png
   results/
-    baseline_average_opinion.png
-    baseline_individual_opinions.png
-    baseline_3d_temporal_plot.png
-    baseline_histogram.png
-    strong_influencer_average_opinion.png
-    strong_expert_average_opinion.png
-    low_trust_average_opinion.png
+    baseline_opinion_history.csv
+    baseline_average_history.csv
+    baseline_final_opinions.csv
+    strong_influencer_opinion_history.csv
+    strong_influencer_average_history.csv
+    strong_influencer_final_opinions.csv
+    strong_expert_opinion_history.csv
+    strong_expert_average_history.csv
+    strong_expert_final_opinions.csv
+    low_trust_opinion_history.csv
+    low_trust_average_history.csv
+    low_trust_final_opinions.csv
     scenario_summary.csv
   report/
     Assignment03_Report.pdf
