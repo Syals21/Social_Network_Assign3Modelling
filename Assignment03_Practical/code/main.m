@@ -66,7 +66,7 @@ for s = 1:length(scenarios)
         seed = 2134;
         delta = 0.35;
         influencer_strength_value = 2.50;
-        p_ci = 0.20;
+        p_ci = 0.35;
         trust_ci_min = 0.75;
         trust_ci_max = 1.00;
 
@@ -90,6 +90,13 @@ for s = 1:length(scenarios)
         gamma = 0.04;
         delta = 0.05;
     end
+
+    fprintf('  agents: citizens=%d, influencers=%d, experts=%d, time steps=%d\n', ...
+            N, I, E, time_steps);
+    fprintf('  network probabilities: citizen=%.2f, influencer=%.2f, expert=%.2f\n', ...
+            p_cc, p_ci, p_ce);
+    fprintf('  update rates: alpha=%.2f, beta=%.2f, gamma=%.2f, delta=%.2f\n', ...
+            alpha, beta, gamma, delta);
 
     % -----------------------------
     % Agent initialization
@@ -324,6 +331,18 @@ for s = 1:length(scenarios)
             final_mean, final_std, classification);
     fprintf('  positive share = %.2f, negative share = %.2f, neutral share = %.2f, echo score = %.2f\n', ...
             share_positive, share_negative, share_neutral, echo_score);
+
+    if strcmp(classification, 'consensus')
+        fprintf('  interpretation: most citizens moved toward a similar opinion.\n');
+    elseif strcmp(classification, 'polarization')
+        fprintf('  interpretation: both supportive and opposing opinion groups remain strong.\n');
+    elseif strcmp(classification, 'fragmentation')
+        fprintf('  interpretation: final opinions remain widely spread across the population.\n');
+    elseif strcmp(classification, 'echo_chambers')
+        fprintf('  interpretation: connected citizens tend to share similar final opinions.\n');
+    else
+        fprintf('  interpretation: public opinion remains moderate or mixed.\n');
+    end
 end
 
 % Combined summary CSV for report comparison.

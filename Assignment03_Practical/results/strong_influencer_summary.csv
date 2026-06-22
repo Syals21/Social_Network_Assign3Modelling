@@ -1,2 +1,2 @@
 scenario,final_mean,final_std,final_min,final_max,classification
-strong_influencer,0.120041,0.557562,-0.822305,0.908832,polarization
+strong_influencer,0.249786,0.473337,-0.778097,0.873777,echo_chambers

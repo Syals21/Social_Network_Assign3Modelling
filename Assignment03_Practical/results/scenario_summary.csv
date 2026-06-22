@@ -1,5 +1,5 @@
 scenario,final_mean,final_std,final_min,final_max,classification
-baseline,0.244097,0.180871,-0.186375,0.610288,mixed_neutral
-strong_influencer,0.120041,0.557562,-0.822305,0.908832,polarization
-strong_expert,0.346557,0.141468,-0.174200,0.580454,mixed_neutral
-low_trust,0.163870,0.082175,-0.040497,0.329497,mixed_neutral
+baseline,0.267694,0.178758,-0.173828,0.589732,mixed_neutral
+strong_influencer,0.249786,0.473337,-0.778097,0.873777,echo_chambers
+strong_expert,0.375523,0.112513,0.029337,0.609855,consensus
+low_trust,0.122272,0.088570,-0.115657,0.312197,mixed_neutral
