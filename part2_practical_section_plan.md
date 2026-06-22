@@ -289,7 +289,7 @@ Recommended tools:
 - GNU Octave for the ABM simulation engine.
 - Octave matrix operations for opinions, trust, and network adjacency.
 - Octave `csvwrite` or `dlmwrite` for exporting simulation results.
-- HTML, CSS, and JavaScript for the GUI.
+- A single HTML file containing the GUI, CSS, and JavaScript.
 - Plotly.js or Chart.js for 2D/3D plots and histograms inside the HTML GUI.
 
 ## Analysis Questions to Answer in the Report
@@ -493,7 +493,9 @@ Main responsibility:
 
 Tasks:
 
-- Create `index.html`, `style.css`, and `app.js`.
+- Create only `index.html` for the GUI.
+- Put all CSS inside a `<style>` tag in `index.html`.
+- Put all JavaScript inside a `<script>` tag in `index.html`.
 - Design the first screen as the actual simulation dashboard, not a landing page.
 - Add a scenario selector with four options:
   - Baseline Model
@@ -534,13 +536,10 @@ Recommended plotting library:
 
 - Use Plotly.js because it supports 2D line plots, 3D plots, and histograms in one library.
 
-Suggested HTML/JS file structure:
+Suggested single-file GUI structure:
 
 ```text
 gui/index.html
-gui/style.css
-gui/app.js
-gui/lib/plotly.min.js
 ```
 
 Suggested JavaScript functions:
@@ -598,8 +597,6 @@ Suggested files:
 
 ```text
 gui/index.html
-gui/style.css
-gui/app.js
 gui/screenshots/baseline_dashboard.png
 gui/screenshots/strong_influencer_dashboard.png
 gui/screenshots/strong_expert_dashboard.png
@@ -699,10 +696,6 @@ Assignment03_Practical/
     export_results.m
   gui/
     index.html
-    style.css
-    app.js
-    lib/
-      plotly.min.js
     screenshots/
       baseline_dashboard.png
       strong_influencer_dashboard.png

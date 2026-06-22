@@ -4,11 +4,52 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Opinion Dynamics ABM</title>
-  <link rel="stylesheet" href="style.css">
+  <!-- Single-file GUI for GitHub Pages publishing. -->
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    /* Person 2: Add all GUI styling here. */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f6f7f9;
+      color: #1f2933;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+  </style>
 </head>
 <body>
-  <!-- Person 2: Build the HTML GUI dashboard here. -->
-  <script src="app.js"></script>
+  <main>
+    <!-- Person 2: Build the full HTML GUI dashboard here. -->
+    <h1>Opinion Dynamics ABM: AI Learning Assistants</h1>
+
+    <section id="controls">
+      <!-- Add scenario selector and CSV upload controls here. -->
+    </section>
+
+    <section id="summary">
+      <!-- Show final mean, standard deviation, min, max, and classification here. -->
+    </section>
+
+    <section id="plots">
+      <!-- Add Plotly chart containers here. -->
+    </section>
+  </main>
+
+  <script>
+    // Person 2: Add all JavaScript here.
+    // Suggested functions:
+    // - parseCSV(text)
+    // - loadScenarioData(scenarioName)
+    // - drawAveragePlot(averageHistory)
+    // - drawIndividualPlot(opinionHistory)
+    // - draw3DTemporalPlot(opinionHistory)
+    // - drawHistogram(finalOpinions)
+    // - updateSummary(summaryRow)
+  </script>
 </body>
 </html>
-

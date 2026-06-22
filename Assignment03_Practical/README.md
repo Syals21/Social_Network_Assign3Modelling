@@ -25,9 +25,8 @@ Model notes are in `code/person1_model_notes.md`.
 
 ## Person 2
 
-Work in `gui/index.html`, `gui/style.css`, and `gui/app.js` for the HTML GUI.
+Work only in `gui/index.html` for the single-file HTML GUI. Put the HTML, CSS, and JavaScript in that one file so it can be published easily using GitHub Pages.
 
 ## Person 3
 
 Work in `report/Assignment03_Report.md` and `report/analysis_summary.md` for the report and analysis.
-
