@@ -4,7 +4,7 @@ Use this folder for the Part 2 practical section.
 
 ## Person 1
 
-The Octave ABM engine is in `code/`.
+The Octave ABM engine is a single file: `code/main.m`.
 
 Run it with GNU Octave:
 
@@ -21,7 +21,7 @@ This generates CSV files in `results/`:
 - Network adjacency files for optional visualization.
 - `scenario_summary.csv` for report comparison.
 
-Model notes are in `code/person1_model_notes.md`.
+All helper functions are included at the bottom of `main.m`, so no other Octave files are required.
 
 ## Person 2
 
