@@ -249,6 +249,51 @@ for s = 1:length(scenarios)
     end
 
     % -----------------------------
+    % Show results in Octave figures
+    % -----------------------------
+    time_axis = 1:time_steps;
+    citizen_axis = 1:N;
+    scenario_title = strrep(scenario_name, '_', ' ');
+
+    figure('Name', ['Results - ' scenario_title]);
+
+    subplot(2, 2, 1);
+    plot(time_axis, average_history, 'b-', 'LineWidth', 2);
+    grid on;
+    ylim([-1 1]);
+    xlabel('Time step');
+    ylabel('Average opinion');
+    title('2D Average Opinion Over Time');
+
+    subplot(2, 2, 2);
+    plot(time_axis, opinion_history);
+    grid on;
+    ylim([-1 1]);
+    xlabel('Time step');
+    ylabel('Citizen opinion');
+    title('2D Individual Citizen Opinions');
+
+    subplot(2, 2, 3);
+    surf(time_axis, citizen_axis, opinion_history');
+    shading interp;
+    xlabel('Time step');
+    ylabel('Citizen ID');
+    zlabel('Opinion');
+    zlim([-1 1]);
+    title('3D Temporal Opinion Plot');
+    view(45, 30);
+
+    subplot(2, 2, 4);
+    hist(final_opinions, 20);
+    grid on;
+    xlim([-1 1]);
+    xlabel('Final opinion');
+    ylabel('Number of citizens');
+    title(['Final Histogram: ' classification]);
+
+    drawnow;
+
+    % -----------------------------
     % CSV export
     % -----------------------------
     prefix = fullfile(output_dir, scenario_name);
@@ -277,6 +322,8 @@ for s = 1:length(scenarios)
 
     fprintf('  final mean = %.4f, std = %.4f, class = %s\n', ...
             final_mean, final_std, classification);
+    fprintf('  positive share = %.2f, negative share = %.2f, neutral share = %.2f, echo score = %.2f\n', ...
+            share_positive, share_negative, share_neutral, echo_score);
 end
 
 % Combined summary CSV for report comparison.
@@ -291,4 +338,17 @@ end
 
 fclose(fid);
 
+fprintf('\nFinal scenario summary:\n');
+fprintf('%-20s %-12s %-12s %-12s %-12s %s\n', ...
+        'Scenario', 'Mean', 'Std', 'Min', 'Max', 'Classification');
+fprintf('%-20s %-12s %-12s %-12s %-12s %s\n', ...
+        '--------', '----', '---', '---', '---', '--------------');
+
+for i = 1:size(summary_rows, 1)
+    fprintf('%-20s %-12.6f %-12.6f %-12.6f %-12.6f %s\n', ...
+            summary_rows{i, 1}, summary_rows{i, 2}, summary_rows{i, 3}, ...
+            summary_rows{i, 4}, summary_rows{i, 5}, summary_rows{i, 6});
+end
+
 fprintf('\nDone. CSV files saved in ../results\n');
+fprintf('Four result figures were opened in Octave, one for each scenario.\n');

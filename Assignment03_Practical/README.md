@@ -21,6 +21,13 @@ This generates CSV files in `results/`:
 - Network adjacency files for optional visualization.
 - `scenario_summary.csv` for report comparison.
 
+It also opens one Octave figure per scenario. Each figure contains:
+
+- 2D average opinion over time.
+- 2D individual citizen opinions over time.
+- 3D temporal opinion plot.
+- Final opinion histogram.
+
 The script is fully inline with no custom helper function files required.
 
 ## Person 2
