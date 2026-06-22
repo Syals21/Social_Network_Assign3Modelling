@@ -301,24 +301,10 @@ for s = 1:length(scenarios)
     drawnow;
 
     % -----------------------------
-    % CSV export
+    % Save graph result
     % -----------------------------
-    prefix = fullfile(output_dir, scenario_name);
-
-    csvwrite([prefix '_opinion_history.csv'], opinion_history);
-    csvwrite([prefix '_average_history.csv'], average_history);
-    csvwrite([prefix '_final_opinions.csv'], final_opinions);
-
-    csvwrite([prefix '_A_cc.csv'], A_cc);
-    csvwrite([prefix '_A_ci.csv'], A_ci);
-    csvwrite([prefix '_A_ce.csv'], A_ce);
-
-    scenario_file = [prefix '_summary.csv'];
-    fid = fopen(scenario_file, 'w');
-    fprintf(fid, 'scenario,final_mean,final_std,final_min,final_max,classification\n');
-    fprintf(fid, '%s,%.6f,%.6f,%.6f,%.6f,%s\n', ...
-            scenario_name, final_mean, final_std, final_min, final_max, classification);
-    fclose(fid);
+    graph_file = fullfile(output_dir, [scenario_name '_graphs.png']);
+    print(graph_file, '-dpng', '-r150');
 
     summary_rows{s, 1} = scenario_name;
     summary_rows{s, 2} = final_mean;
@@ -345,18 +331,6 @@ for s = 1:length(scenarios)
     end
 end
 
-% Combined summary CSV for report comparison.
-fid = fopen(fullfile(output_dir, 'scenario_summary.csv'), 'w');
-fprintf(fid, 'scenario,final_mean,final_std,final_min,final_max,classification\n');
-
-for i = 1:size(summary_rows, 1)
-    fprintf(fid, '%s,%.6f,%.6f,%.6f,%.6f,%s\n', ...
-            summary_rows{i, 1}, summary_rows{i, 2}, summary_rows{i, 3}, ...
-            summary_rows{i, 4}, summary_rows{i, 5}, summary_rows{i, 6});
-end
-
-fclose(fid);
-
 fprintf('\nFinal scenario summary:\n');
 fprintf('%-20s %-12s %-12s %-12s %-12s %s\n', ...
         'Scenario', 'Mean', 'Std', 'Min', 'Max', 'Classification');
@@ -369,5 +343,5 @@ for i = 1:size(summary_rows, 1)
             summary_rows{i, 4}, summary_rows{i, 5}, summary_rows{i, 6});
 end
 
-fprintf('\nDone. CSV files saved in ../results\n');
+fprintf('\nDone. Graph images saved in ../results\n');
 fprintf('Four result figures were opened in Octave, one for each scenario.\n');

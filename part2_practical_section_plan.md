@@ -288,9 +288,8 @@ Recommended tools:
 
 - GNU Octave for the ABM simulation engine.
 - Octave matrix operations for opinions, trust, and network adjacency.
-- Octave `csvwrite` or `dlmwrite` for exporting simulation results.
+- Octave figure windows for graph results.
 - A single HTML file containing the GUI, CSS, and JavaScript.
-- Plotly.js or Chart.js for 2D/3D plots and histograms inside the HTML GUI.
 
 ## Analysis Questions to Answer in the Report
 
@@ -315,12 +314,12 @@ Then answer these overall questions:
 Main responsibility:
 
 - Build the full ABM simulation engine using GNU Octave.
-- Produce clean result files that Person 2 can load into the HTML GUI and Person 3 can use for analysis.
+- Produce graph results directly in Octave for screenshots and report analysis.
 
 Tasks:
 
 - Create the main Octave file `main.m`.
-- Create a configuration file or function called `scenario_config.m`.
+- Keep the Octave work in one file only: `main.m`.
 - Use matrices/vectors instead of complicated object-oriented code because Octave works well with matrix calculations.
 - Represent citizen opinions as a vector:
 
@@ -408,80 +407,48 @@ average_history = time_steps x 1 vector
   - `strong_expert`
   - `low_trust`
 
-- For each scenario, export files:
-  - Individual opinion history
-  - Average opinion over time
-  - Final opinions
-  - Summary statistics
-  - Network adjacency data if needed for visualization
+- For each scenario, display graph results in Octave:
+  - 2D average opinion over time
+  - 2D individual citizen opinions over time
+  - 3D temporal opinion plot
+  - Final opinion histogram
+  - Printed summary statistics in the Octave command window
 
-Suggested Octave function structure:
+Suggested Octave script structure inside `main.m`:
 
 ```text
-main.m
-  calls run_all_scenarios()
-
-scenario_config.m
-  returns parameter values for each scenario
-
-initialize_agents.m
-  creates initial opinions and influence values
-
-build_network.m
-  creates A_cc, A_ci, A_ce, T_cc, T_ci, T_ce
-
-run_simulation.m
-  loops through time and updates opinions
-
-classify_result.m
-  calculates mean, standard deviation, and basic classification
-
-export_results.m
-  saves CSV files for the HTML GUI and report
+1. Clear workspace and define scenario names.
+2. Loop through the four scenarios.
+3. Set parameters for the current scenario.
+4. Initialize citizens, influencers, experts, network links, and trust matrices.
+5. Run the opinion update loop.
+6. Classify the final result.
+7. Open one Octave figure for the scenario.
+8. Save the figure as a PNG image in `results/`.
+9. Print summary statistics in the Octave command window.
 ```
 
-Minimum CSV outputs for each scenario:
+Minimum graph outputs:
 
 ```text
-results/baseline_opinion_history.csv
-results/baseline_average_history.csv
-results/baseline_final_opinions.csv
-results/strong_influencer_opinion_history.csv
-results/strong_influencer_average_history.csv
-results/strong_influencer_final_opinions.csv
-results/strong_expert_opinion_history.csv
-results/strong_expert_average_history.csv
-results/strong_expert_final_opinions.csv
-results/low_trust_opinion_history.csv
-results/low_trust_average_history.csv
-results/low_trust_final_opinions.csv
-results/scenario_summary.csv
-```
-
-`scenario_summary.csv` should include:
-
-```text
-scenario,final_mean,final_std,final_min,final_max,classification
+results/baseline_graphs.png
+results/strong_influencer_graphs.png
+results/strong_expert_graphs.png
+results/low_trust_graphs.png
 ```
 
 Deliverables:
 
 - Working Octave ABM engine.
 - Four scenario simulations.
-- CSV result files for Person 2 and Person 3.
+- Octave graph figures or saved graph images for Person 2 and Person 3.
 - Short notes explaining the model parameters and equations.
 
 Suggested files:
 
 ```text
 code/main.m
-code/scenario_config.m
-code/initialize_agents.m
-code/build_network.m
-code/run_simulation.m
-code/classify_result.m
-code/export_results.m
-results/scenario_summary.csv
+results/*_graphs.png
 ```
 
 ### Person 2: HTML GUI, Visualizations, and Experiment Display
@@ -489,7 +456,7 @@ results/scenario_summary.csv
 Main responsibility:
 
 - Build a functional HTML-based GUI that displays the Octave simulation results.
-- The GUI does not need to run Octave directly. It can load the CSV files exported by Person 1.
+- The GUI does not need to run Octave directly. It can display screenshots or graph images produced from Octave.
 
 Tasks:
 
@@ -502,39 +469,28 @@ Tasks:
   - Strong Influencer Impact
   - Strong Expert Intervention
   - Low Trust Environment
-- Add a file-loading method for CSV data. Use either:
-  - Option A: Place all CSV files in a `results/` folder and load them using JavaScript `fetch()` when running through a local server.
-  - Option B: Add file input controls so the user can upload the CSV files manually in the browser.
-- Recommended simple method: use Option B if the lecturer will open the HTML file directly without a server.
-- Use JavaScript to parse CSV files into arrays.
+- Add sections for the four scenario screenshots or graph images.
+- Add short text explanations beside or below each graph image.
 - Display the selected scenario's:
   - Average opinion over time
   - Individual citizen opinions over time
   - 3D temporal plot
   - Final opinion histogram
-  - Summary statistics and classification
+  - Summary statistics and classification copied from the Octave command window
 
 Required GUI sections:
 
 - Header/title: `Opinion Dynamics ABM: AI Learning Assistants`
 - Scenario selector
-- CSV upload area or data loading buttons
+- Scenario navigation buttons or tabs
 - Summary panel showing:
   - Final mean opinion
   - Final standard deviation
   - Minimum opinion
   - Maximum opinion
   - Classification
-- Plot area for:
-  - 2D average opinion line plot
-  - 2D individual opinion temporal plot
-  - 3D opinion surface/scatter plot
-  - Final opinion histogram
+- Plot/screenshot area for the Octave graph image of each scenario
 - Short findings box where the result explanation can be shown for the selected scenario
-
-Recommended plotting library:
-
-- Use Plotly.js because it supports 2D line plots, 3D plots, and histograms in one library.
 
 Suggested single-file GUI structure:
 
@@ -545,14 +501,10 @@ gui/index.html
 Suggested JavaScript functions:
 
 ```text
-loadScenarioData(scenarioName)
-parseCSV(text)
-drawAveragePlot(averageHistory)
-drawIndividualPlot(opinionHistory)
-draw3DTemporalPlot(opinionHistory)
-drawHistogram(finalOpinions)
-updateSummary(summaryRow)
-updateFindingsText(scenarioName, summaryRow)
+selectScenario(scenarioName)
+showScenarioScreenshot(scenarioName)
+updateSummary(scenarioName)
+updateFindingsText(scenarioName)
 ```
 
 Suggested plot details:
@@ -584,13 +536,13 @@ GUI requirements:
 - Must include clear labels and legends.
 - Must allow switching between all four scenarios.
 - Must show the classification result for each scenario.
-- Must work using the CSV output format from Person 1.
+- Must work using screenshots or graph images from Octave.
 
 Deliverables:
 
 - Functional HTML GUI.
-- JavaScript code that loads/parses result CSV files.
-- 2D and 3D plots inside the GUI.
+- JavaScript code that switches between scenario views.
+- Octave graph screenshots/images displayed inside the GUI.
 - Screenshots of each scenario's plots for the report.
 
 Suggested files:
@@ -611,8 +563,8 @@ Main responsibility:
 
 Tasks:
 
-- Read `results/scenario_summary.csv` from Person 1.
-- Review the GUI plots and screenshots from Person 2.
+- Read the Octave command window summary from Person 1.
+- Review the Octave graph screenshots from Person 2.
 - Create a scenario comparison table with:
   - Scenario name
   - Final average opinion
@@ -688,12 +640,6 @@ submission_checklist.md
 Assignment03_Practical/
   code/
     main.m
-    scenario_config.m
-    initialize_agents.m
-    build_network.m
-    run_simulation.m
-    classify_result.m
-    export_results.m
   gui/
     index.html
     screenshots/
@@ -702,19 +648,10 @@ Assignment03_Practical/
       strong_expert_dashboard.png
       low_trust_dashboard.png
   results/
-    baseline_opinion_history.csv
-    baseline_average_history.csv
-    baseline_final_opinions.csv
-    strong_influencer_opinion_history.csv
-    strong_influencer_average_history.csv
-    strong_influencer_final_opinions.csv
-    strong_expert_opinion_history.csv
-    strong_expert_average_history.csv
-    strong_expert_final_opinions.csv
-    low_trust_opinion_history.csv
-    low_trust_average_history.csv
-    low_trust_final_opinions.csv
-    scenario_summary.csv
+    baseline_graphs.png
+    strong_influencer_graphs.png
+    strong_expert_graphs.png
+    low_trust_graphs.png
   report/
     Assignment03_Report.pdf
   README.md
