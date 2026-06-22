@@ -21,7 +21,7 @@ This generates CSV files in `results/`:
 - Network adjacency files for optional visualization.
 - `scenario_summary.csv` for report comparison.
 
-All helper functions are included at the bottom of `main.m`, so no other Octave files are required.
+The script is fully inline with no custom helper function files required.
 
 ## Person 2
 
