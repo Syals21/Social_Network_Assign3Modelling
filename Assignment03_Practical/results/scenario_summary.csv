@@ -1,0 +1,5 @@
+scenario,final_mean,final_std,final_min,final_max,classification
+baseline,0.267694,0.178758,-0.173828,0.589732,mixed_neutral
+strong_influencer,0.128476,0.536254,-0.859390,0.860325,polarization
+strong_expert,0.375523,0.112513,0.029337,0.609855,consensus
+low_trust,0.122272,0.088570,-0.115657,0.312197,mixed_neutral

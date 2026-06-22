@@ -4,7 +4,24 @@ Use this folder for the Part 2 practical section.
 
 ## Person 1
 
-Work in `code/main.m` for the Octave ABM engine.
+The Octave ABM engine is in `code/`.
+
+Run it with GNU Octave:
+
+```bash
+cd code
+octave main.m
+```
+
+This generates CSV files in `results/`:
+
+- Four scenario opinion histories.
+- Four average opinion histories.
+- Four final opinion files.
+- Network adjacency files for optional visualization.
+- `scenario_summary.csv` for report comparison.
+
+Model notes are in `code/person1_model_notes.md`.
 
 ## Person 2
 

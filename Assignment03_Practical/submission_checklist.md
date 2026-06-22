@@ -1,8 +1,8 @@
 # Submission Checklist
 
-- [ ] Octave ABM source code completed.
-- [ ] Four scenarios completed.
-- [ ] CSV result files exported.
+- [x] Octave ABM source code completed.
+- [x] Four scenarios completed.
+- [x] CSV result files exported.
 - [ ] HTML GUI completed.
 - [ ] Required plots displayed or exported.
 - [ ] Scenario analysis completed.
