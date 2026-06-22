@@ -290,6 +290,7 @@ Recommended tools:
 - Octave matrix operations for opinions, trust, and network adjacency.
 - Octave figure windows for graph results.
 - A single HTML file containing the GUI, CSS, and JavaScript.
+- Browser-side JavaScript for the interactive dashboard and plots.
 
 ## Analysis Questions to Answer in the Report
 
@@ -455,8 +456,8 @@ results/*_graphs.png
 
 Main responsibility:
 
-- Build a functional HTML-based GUI that displays the Octave simulation results.
-- The GUI does not need to run Octave directly. It can display screenshots or graph images produced from Octave.
+- Build a functional single-file HTML GUI that can run the ABM interactively in the browser.
+- Keep the GUI aligned with the Octave model parameters and scenario logic.
 
 Tasks:
 
@@ -469,28 +470,34 @@ Tasks:
   - Strong Influencer Impact
   - Strong Expert Intervention
   - Low Trust Environment
-- Add sections for the four scenario screenshots or graph images.
-- Add short text explanations beside or below each graph image.
+- Add parameter inputs for number of citizens, influencers, experts, and time steps.
+- Add sliders for averaging effect, expert effect, and influencer effect.
+- Add a `Run Model` button and a `Reset` button.
+- Implement the ABM update logic in JavaScript so the published GitHub Pages GUI works without Octave.
+- Add an optional section that displays matching Octave graph images from `results/` when those images exist.
+- Add short text explanations beside or below each scenario result.
 - Display the selected scenario's:
   - Average opinion over time
   - Individual citizen opinions over time
   - 3D temporal plot
   - Final opinion histogram
-  - Summary statistics and classification copied from the Octave command window
+  - Summary statistics and classification
 
 Required GUI sections:
 
 - Header/title: `Opinion Dynamics ABM: AI Learning Assistants`
 - Scenario selector
-- Scenario navigation buttons or tabs
+- Parameter controls
+- Run/reset controls
 - Summary panel showing:
   - Final mean opinion
   - Final standard deviation
   - Minimum opinion
   - Maximum opinion
   - Classification
-- Plot/screenshot area for the Octave graph image of each scenario
+- Plot area for the four required graphs
 - Short findings box where the result explanation can be shown for the selected scenario
+- Optional Octave graph image preview
 
 Suggested single-file GUI structure:
 
@@ -501,10 +508,14 @@ gui/index.html
 Suggested JavaScript functions:
 
 ```text
-selectScenario(scenarioName)
+scenarioDefaults(scenarioName)
+buildScenarioParams()
+runSimulation(params)
+plotResults(result)
+plotFallbackResults(result)
+updateSummary(result)
+updateFindings(result)
 showScenarioScreenshot(scenarioName)
-updateSummary(scenarioName)
-updateFindingsText(scenarioName)
 ```
 
 Suggested plot details:
@@ -536,13 +547,13 @@ GUI requirements:
 - Must include clear labels and legends.
 - Must allow switching between all four scenarios.
 - Must show the classification result for each scenario.
-- Must work using screenshots or graph images from Octave.
+- Must work as a published GitHub Pages page using only the single HTML file.
 
 Deliverables:
 
 - Functional HTML GUI.
-- JavaScript code that switches between scenario views.
-- Octave graph screenshots/images displayed inside the GUI.
+- JavaScript code that runs the ABM and redraws all result plots.
+- Optional Octave graph screenshots/images displayed inside the GUI.
 - Screenshots of each scenario's plots for the report.
 
 Suggested files:
