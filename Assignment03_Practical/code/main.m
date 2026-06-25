@@ -1,10 +1,5 @@
-% STTHK2133 Assignment 3 - Part 2
-% Person 1 deliverable: single-file Octave ABM engine.
-%
-% This version is written as a plain script without local functions so it
-% works in older GNU Octave versions too.
-%
-% Run from this folder with:
+% This script simulates how opinions change in a social network.
+% Run it from this folder with:
 %   octave main.m
 
 clear;
@@ -25,33 +20,31 @@ for s = 1:length(scenarios)
     scenario_name = scenarios{s};
     fprintf('Scenario: %s\n', scenario_name);
 
-    % -----------------------------
-    % Scenario configuration
-    % -----------------------------
-    N = 100;             % citizens, assignment range: 50-200
-    I = 5;               % influencers, assignment range: 3-10
-    E = 3;               % education experts, assignment range: 1-5
-    time_steps = 75;     % assignment range: 50-100
+    % These values set the population size and simulation length.
+    N = 100;             % The number of citizens is within the required range.
+    I = 5;               % The number of influencers is within the required range.
+    E = 3;               % The number of education experts is within the required range.
+    time_steps = 75;     % The number of time steps is within the required range.
 
     seed = 2133;
 
-    % Network probabilities.
-    p_cc = 0.08;         % citizen-citizen links
-    p_ci = 0.45;         % citizen-influencer links
-    p_ce = 0.30;         % citizen-expert links
+    % These probabilities control how connected the agents are.
+    p_cc = 0.08;         % This controls citizen-to-citizen links.
+    p_ci = 0.45;         % This controls citizen-to-influencer links.
+    p_ce = 0.30;         % This controls citizen-to-expert links.
 
-    % Opinion update rates.
-    alpha = 0.05;        % direct one-to-one citizen influence
-    beta = 0.12;         % neighbour averaging / social pressure
-    gamma = 0.10;        % expert correction
-    delta = 0.10;        % influencer pressure
+    % These rates control how strongly opinions move after interaction.
+    alpha = 0.05;        % This controls direct citizen influence.
+    beta = 0.12;         % This controls neighbour averaging.
+    gamma = 0.10;        % This controls expert influence.
+    delta = 0.10;        % This controls influencer influence.
 
-    % Influence strengths.
+    % These values give different agent roles different influence levels.
     citizen_influence = 0.35;
     influencer_strength_value = 1.25;
     expert_strength = 0.75;
 
-    % Trust ranges.
+    % These ranges describe how much citizens trust each connected agent type.
     trust_cc_min = 0.25;
     trust_cc_max = 0.75;
     trust_ci_min = 0.35;
@@ -98,32 +91,28 @@ for s = 1:length(scenarios)
     fprintf('  update rates: alpha=%.2f, beta=%.2f, gamma=%.2f, delta=%.2f\n', ...
             alpha, beta, gamma, delta);
 
-    % -----------------------------
-    % Agent initialization
-    % -----------------------------
+    % The initial opinions and fixed role opinions are created here.
     rng(seed, 'twister');
 
-    % Citizens begin with diverse opinions from strongly against to strongly support.
+    % Citizen opinions begin with a mix of negative, neutral, and positive views.
     O_citizens = -1 + 2 * rand(N, 1);
 
-    % Influencers are intentionally stronger and more extreme.
+    % Influencers are given stronger opinions so their social effect can be tested.
     base_influencer_opinions = [0.95; 0.90; -0.95; -0.90; 0.95; -0.90; 0.70; -0.70; 0.80; -0.75];
     O_influencers = base_influencer_opinions(1:I);
 
-    % Experts are balanced or moderately supportive of the AI education policy.
+    % Experts are kept closer to balanced or moderately supportive opinions.
     base_expert_opinions = [0.35; 0.45; 0.50; 0.25; 0.55];
     O_experts = base_expert_opinions(1:E);
 
     citizen_influence_vector = citizen_influence * ones(N, 1);
     influencer_strength = influencer_strength_value * ones(I, 1);
 
-    % -----------------------------
-    % Random network and trust setup
-    % -----------------------------
+    % The social network and trust values are generated randomly for each scenario.
     rng(seed + 1000, 'twister');
 
     A_cc = double(rand(N, N) < p_cc);
-    A_cc = A_cc - diag(diag(A_cc));       % remove citizen self-links
+    A_cc = A_cc - diag(diag(A_cc));       % Citizens should not connect to themselves.
 
     A_ci = double(rand(N, I) < p_ci);
     A_ce = double(rand(N, E) < p_ce);
@@ -132,9 +121,7 @@ for s = 1:length(scenarios)
     T_ci = (trust_ci_min + (trust_ci_max - trust_ci_min) * rand(N, I)) .* A_ci;
     T_ce = (trust_ce_min + (trust_ce_max - trust_ce_min) * rand(N, E)) .* A_ce;
 
-    % -----------------------------
-    % Simulation
-    % -----------------------------
+    % The simulation stores both individual opinions and the population average.
     O = O_citizens;
     opinion_history = zeros(time_steps, N);
     average_history = zeros(time_steps, 1);
@@ -148,7 +135,7 @@ for s = 1:length(scenarios)
         for i = 1:N
             current_opinion = O(i);
 
-            % Direct citizen-to-citizen influence from one connected neighbour.
+            % A citizen may be directly influenced by one connected citizen.
             neighbours = find(A_cc(i, :) > 0);
             if isempty(neighbours)
                 direct_effect = 0;
@@ -167,7 +154,7 @@ for s = 1:length(scenarios)
                 average_effect = beta * (mean_neighbour_opinion - O(i));
             end
 
-            % Education expert correction effect.
+            % Connected experts pull opinions toward a more balanced position.
             connected_experts = find(A_ce(i, :) > 0);
             if isempty(connected_experts)
                 expert_effect = 0;
@@ -180,7 +167,7 @@ for s = 1:length(scenarios)
                               * (mean_expert_opinion - current_opinion);
             end
 
-            % Influencer effect.
+            % Connected influencers can move opinions more strongly.
             connected_influencers = find(A_ci(i, :) > 0);
             if isempty(connected_influencers)
                 influencer_effect = 0;
@@ -201,7 +188,7 @@ for s = 1:length(scenarios)
                      + influencer_effect;
         end
 
-        % Keep all opinions inside the assignment range [-1, +1].
+        % Opinion values are kept inside the allowed range.
         O = max(-1, min(1, O_new));
         opinion_history(t, :) = O';
         average_history(t) = mean(O);
@@ -209,9 +196,7 @@ for s = 1:length(scenarios)
 
     final_opinions = O;
 
-    % -----------------------------
-    % Classification
-    % -----------------------------
+    % Summary values are used to classify the final opinion pattern.
     final_mean = mean(final_opinions);
     final_std = std(final_opinions);
     final_min = min(final_opinions);
@@ -255,9 +240,7 @@ for s = 1:length(scenarios)
         classification = 'mixed_neutral';
     end
 
-    % -----------------------------
-    % Show results in Octave figures
-    % -----------------------------
+    % Each scenario is shown using the required plots.
     time_axis = 1:time_steps;
     citizen_axis = 1:N;
     scenario_title = strrep(scenario_name, '_', ' ');
@@ -300,9 +283,7 @@ for s = 1:length(scenarios)
 
     drawnow;
 
-    % -----------------------------
-    % Save graph result
-    % -----------------------------
+    % The combined graph is saved so it can be used in the report or website.
     graph_file = fullfile(output_dir, [scenario_name '_graphs.png']);
     print(graph_file, '-dpng', '-r150');
 
