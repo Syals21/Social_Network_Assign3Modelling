@@ -4,23 +4,38 @@ Use this folder for the Part 2 practical section.
 
 ## Person 1
 
-The Octave ABM engine is a single file: `code/main.m`.
+The Octave ABM engine is separated into four scenario files:
+
+- `code/baseline.m`
+- `code/strong_influencer.m`
+- `code/strong_expert.m`
+- `code/low_trust.m`
 
 Run it with GNU Octave:
 
 ```bash
 cd code
-octave main.m
+octave baseline.m
+octave strong_influencer.m
+octave strong_expert.m
+octave low_trust.m
 ```
 
-This opens one Octave figure per scenario and saves graph images in `results/`. Each figure contains:
+Each file opens one Octave figure for its scenario and saves a graph image in `results/`. Each figure contains:
 
 - 2D average opinion over time.
 - 2D individual citizen opinions over time.
 - 3D temporal opinion plot.
 - Final opinion histogram.
 
-The script is fully inline with no custom helper function files required.
+Each script is fully inline with no custom helper function files required.
+
+Note: `baseline.m` also runs two boundary tests:
+
+- Extreme influencer effect with near-zero expert effect.
+- Extreme expert effect with near-zero influencer effect.
+
+This produces extra graph images in `results/` for comparison.
 
 ## Person 2
 

@@ -1,24 +1,34 @@
 % This script simulates how opinions change in a social network.
 % Run it from this folder with:
-%   octave main.m
+%   octave baseline.m
 
 clear;
 clc;
 
 fprintf('Opinion Dynamics ABM: AI Learning Assistants\n');
-fprintf('Running all scenarios...\n\n');
+script_file = mfilename('fullpath');
+if isempty(script_file)
+    script_dir = pwd;
+else
+    script_dir = fileparts(script_file);
+end
 
-scenarios = {'baseline', 'strong_influencer', 'strong_expert', 'low_trust'};
-summary_rows = cell(length(scenarios), 6);
-
-output_dir = fullfile('..', 'results');
+output_dir = fullfile(script_dir, '..', 'results');
 if exist(output_dir, 'dir') ~= 7
     mkdir(output_dir);
 end
 
-for s = 1:length(scenarios)
-    scenario_name = scenarios{s};
-    fprintf('Scenario: %s\n', scenario_name);
+scenario_list = {
+    'baseline';
+    'baseline_extreme_influencer_low_expert';
+    'baseline_extreme_expert_low_influencer'
+};
+
+summary_rows = cell(length(scenario_list), 6);
+
+for scenario_index = 1:length(scenario_list)
+scenario_name = scenario_list{scenario_index};
+fprintf('Scenario: %s\n', scenario_name);
 
     % These values set the population size and simulation length.
     N = 100;             % The number of citizens is within the required range.
@@ -52,36 +62,30 @@ for s = 1:length(scenarios)
     trust_ce_min = 0.60;
     trust_ce_max = 0.95;
 
-    if strcmp(scenario_name, 'baseline')
-        seed = 2133;
-
-    elseif strcmp(scenario_name, 'strong_influencer')
-        seed = 2134;
-        delta = 0.35;
-        influencer_strength_value = 2.50;
-        p_ci = 0.35;
-        trust_ci_min = 0.75;
+    if strcmp(scenario_name, 'baseline_extreme_influencer_low_expert')
+        seed = 2233;
+        delta = 0.50;
+        influencer_strength_value = 3.00;
+        gamma = 0.01;
+        expert_strength = 0.05;
+        p_ci = 0.60;
+        p_ce = 0.10;
+        trust_ci_min = 0.85;
         trust_ci_max = 1.00;
-
-    elseif strcmp(scenario_name, 'strong_expert')
-        seed = 2135;
-        gamma = 0.25;
-        expert_strength = 1.25;
-        p_ce = 0.40;
-        trust_ce_min = 0.80;
+        trust_ce_min = 0.01;
+        trust_ce_max = 0.10;
+    elseif strcmp(scenario_name, 'baseline_extreme_expert_low_influencer')
+        seed = 2333;
+        gamma = 0.50;
+        expert_strength = 3.00;
+        delta = 0.01;
+        influencer_strength_value = 0.05;
+        p_ce = 0.60;
+        p_ci = 0.10;
+        trust_ce_min = 0.85;
         trust_ce_max = 1.00;
-
-    elseif strcmp(scenario_name, 'low_trust')
-        seed = 2136;
-        trust_cc_min = 0.05;
-        trust_cc_max = 0.30;
-        trust_ci_min = 0.05;
-        trust_ci_max = 0.30;
-        trust_ce_min = 0.10;
-        trust_ce_max = 0.35;
-        beta = 0.06;
-        gamma = 0.04;
-        delta = 0.05;
+        trust_ci_min = 0.01;
+        trust_ci_max = 0.10;
     end
 
     fprintf('  agents: citizens=%d, influencers=%d, experts=%d, time steps=%d\n', ...
@@ -92,7 +96,8 @@ for s = 1:length(scenarios)
             alpha, beta, gamma, delta);
 
     % The initial opinions and fixed role opinions are created here.
-    rng(seed, 'twister');
+    rand('seed', seed);
+    randn('seed', seed);
 
     % Citizen opinions begin with a mix of negative, neutral, and positive views.
     O_citizens = -1 + 2 * rand(N, 1);
@@ -109,7 +114,8 @@ for s = 1:length(scenarios)
     influencer_strength = influencer_strength_value * ones(I, 1);
 
     % The social network and trust values are generated randomly for each scenario.
-    rng(seed + 1000, 'twister');
+    rand('seed', seed + 1000);
+    randn('seed', seed + 1000);
 
     A_cc = double(rand(N, N) < p_cc);
     A_cc = A_cc - diag(diag(A_cc));       % Citizens should not connect to themselves.
@@ -141,7 +147,7 @@ for s = 1:length(scenarios)
                 direct_effect = 0;
                 average_effect = 0;
             else
-                selected_position = randi(length(neighbours));
+                selected_position = ceil(rand * length(neighbours));
                 j = neighbours(selected_position);
                 trust_ij = T_cc(i, j);
 
@@ -285,14 +291,18 @@ for s = 1:length(scenarios)
 
     % The combined graph is saved so it can be used in the report or website.
     graph_file = fullfile(output_dir, [scenario_name '_graphs.png']);
-    print(graph_file, '-dpng', '-r150');
+    try
+        print(graph_file, '-dpng', '-r150');
+    catch
+        fprintf('  graph image could not be saved, but the figure was created.\n');
+    end
 
-    summary_rows{s, 1} = scenario_name;
-    summary_rows{s, 2} = final_mean;
-    summary_rows{s, 3} = final_std;
-    summary_rows{s, 4} = final_min;
-    summary_rows{s, 5} = final_max;
-    summary_rows{s, 6} = classification;
+    summary_rows{scenario_index, 1} = scenario_name;
+    summary_rows{scenario_index, 2} = final_mean;
+    summary_rows{scenario_index, 3} = final_std;
+    summary_rows{scenario_index, 4} = final_min;
+    summary_rows{scenario_index, 5} = final_max;
+    summary_rows{scenario_index, 6} = classification;
 
     fprintf('  final mean = %.4f, std = %.4f, class = %s\n', ...
             final_mean, final_std, classification);
@@ -312,17 +322,17 @@ for s = 1:length(scenarios)
     end
 end
 
-fprintf('\nFinal scenario summary:\n');
-fprintf('%-20s %-12s %-12s %-12s %-12s %s\n', ...
+fprintf('\nBaseline boundary test summary:\n');
+fprintf('%-40s %-12s %-12s %-12s %-12s %s\n', ...
         'Scenario', 'Mean', 'Std', 'Min', 'Max', 'Classification');
-fprintf('%-20s %-12s %-12s %-12s %-12s %s\n', ...
+fprintf('%-40s %-12s %-12s %-12s %-12s %s\n', ...
         '--------', '----', '---', '---', '---', '--------------');
 
 for i = 1:size(summary_rows, 1)
-    fprintf('%-20s %-12.6f %-12.6f %-12.6f %-12.6f %s\n', ...
+    fprintf('%-40s %-12.6f %-12.6f %-12.6f %-12.6f %s\n', ...
             summary_rows{i, 1}, summary_rows{i, 2}, summary_rows{i, 3}, ...
             summary_rows{i, 4}, summary_rows{i, 5}, summary_rows{i, 6});
 end
 
 fprintf('\nDone. Graph images saved in ../results\n');
-fprintf('Four result figures were opened in Octave, one for each scenario.\n');
+

@@ -319,8 +319,12 @@ Main responsibility:
 
 Tasks:
 
-- Create the main Octave file `main.m`.
-- Keep the Octave work in one file only: `main.m`.
+- Create four Octave scenario files:
+  - `baseline.m`
+  - `strong_influencer.m`
+  - `strong_expert.m`
+  - `low_trust.m`
+- Keep each scenario script standalone so it can be run separately in Octave.
 - Use matrices/vectors instead of complicated object-oriented code because Octave works well with matrix calculations.
 - Represent citizen opinions as a vector:
 
@@ -415,18 +419,17 @@ average_history = time_steps x 1 vector
   - Final opinion histogram
   - Printed summary statistics in the Octave command window
 
-Suggested Octave script structure inside `main.m`:
+Suggested Octave script structure inside each scenario file:
 
 ```text
-1. Clear workspace and define scenario names.
-2. Loop through the four scenarios.
-3. Set parameters for the current scenario.
-4. Initialize citizens, influencers, experts, network links, and trust matrices.
-5. Run the opinion update loop.
-6. Classify the final result.
-7. Open one Octave figure for the scenario.
-8. Save the figure as a PNG image in `results/`.
-9. Print summary statistics in the Octave command window.
+1. Clear workspace and set the scenario name.
+2. Set parameters for that scenario.
+3. Initialize citizens, influencers, experts, network links, and trust matrices.
+4. Run the opinion update loop.
+5. Classify the final result.
+6. Open one Octave figure for the scenario.
+7. Save the figure as a PNG image in `results/`.
+8. Print summary statistics in the Octave command window.
 ```
 
 Minimum graph outputs:
@@ -448,7 +451,10 @@ Deliverables:
 Suggested files:
 
 ```text
-code/main.m
+code/baseline.m
+code/strong_influencer.m
+code/strong_expert.m
+code/low_trust.m
 results/*_graphs.png
 ```
 
@@ -650,7 +656,10 @@ submission_checklist.md
 ```text
 Assignment03_Practical/
   code/
-    main.m
+    baseline.m
+    strong_influencer.m
+    strong_expert.m
+    low_trust.m
   gui/
     index.html
     screenshots/
