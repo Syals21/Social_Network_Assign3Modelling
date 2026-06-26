@@ -34,7 +34,7 @@ fprintf('Scenario: %s\n', scenario_name);
     N = 100;             % The number of citizens is within the required range.
     I = 5;               % The number of influencers is within the required range.
     E = 3;               % The number of education experts is within the required range.
-    time_steps = 75;     % The number of time steps is within the required range.
+    time_steps = 100;    % The number of time steps is within the required range.
 
     seed = 2133;
 

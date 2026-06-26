@@ -653,7 +653,7 @@
 
         <div class="control-group">
           <label for="steps">Time Steps</label>
-          <input id="steps" type="number" min="50" max="100" step="1" value="75">
+          <input id="steps" type="number" min="50" max="1000" step="1" value="100">
         </div>
 
         <div class="control-group">
@@ -783,7 +783,7 @@
           <h2>Octave Graph Image</h2>
           <div class="image-wrap" id="octaveImageWrap">
             <img id="octaveImage" alt="Octave graph result">
-            <div id="missingImage" class="missing-image">Run `code/main.m` in Octave to generate the matching graph image in `results/`.</div>
+            <div id="missingImage" class="missing-image">Run the matching `.m` file in `code/` to generate the graph image in `results/`.</div>
           </div>
         </section>
       </section>
@@ -827,6 +827,7 @@
       expertStrengthValue: document.getElementById("expertStrengthValue"),
       influencerStrengthValue: document.getElementById("influencerStrengthValue"),
       status: document.getElementById("status"),
+      runButton: document.getElementById("runButton"),
       mean: document.getElementById("meanMetric"),
       std: document.getElementById("stdMetric"),
       min: document.getElementById("minMetric"),
@@ -843,6 +844,8 @@
       policyText: document.getElementById("policyText"),
       policyAction: document.getElementById("policyAction")
     };
+
+    let activeRunId = 0;
 
     function mulberry32(seed) {
       let value = seed >>> 0;
@@ -936,7 +939,10 @@
 
     function getNumber(id, min, max) {
       const value = Number(controls[id].value);
-      return clamp(Math.round(value), min, max);
+      const safeValue = Number.isFinite(value) ? value : min;
+      const clampedValue = clamp(Math.round(safeValue), min, max);
+      controls[id].value = clampedValue;
+      return clampedValue;
     }
 
     function scenarioDefaults(name) {
@@ -1007,7 +1013,7 @@
       params.N = getNumber("citizens", 50, 200);
       params.I = getNumber("influencers", 3, 10);
       params.E = getNumber("experts", 1, 5);
-      params.timeSteps = getNumber("steps", 50, 100);
+      params.timeSteps = getNumber("steps", 50, 1000);
       params.beta = Number(controls.averaging.value);
       params.gamma = Number(controls.expertStrength.value);
       params.delta = Number(controls.influencerStrength.value);
@@ -1550,29 +1556,45 @@
     }
 
     function showScenarioScreenshot(scenario) {
-      outputs.octaveImage.src = scenarioImageMap[scenario];
-      outputs.octaveImage.style.display = "block";
-      outputs.missingImage.style.display = "none";
+      outputs.octaveImage.onload = function handleLoadedImage() {
+        outputs.octaveImage.style.display = "block";
+        outputs.missingImage.style.display = "none";
+      };
       outputs.octaveImage.onerror = function handleMissingImage() {
         outputs.octaveImage.style.display = "none";
         outputs.missingImage.style.display = "block";
       };
+      outputs.missingImage.style.display = "none";
+      outputs.octaveImage.src = scenarioImageMap[scenario];
     }
 
     function runModel() {
+      const runId = activeRunId + 1;
+      activeRunId = runId;
       outputs.status.textContent = "Simulating agents...";
       outputs.progressBar.classList.add("running");
+      outputs.runButton.disabled = true;
       const params = buildScenarioParams();
       showScenarioScreenshot(params.scenario);
 
       setTimeout(() => {
-        const result = runSimulation(params);
-        updateSummary(result);
-        updateFindings(result);
-        updatePolicy(result);
-        plotResults(result);
-        outputs.progressBar.classList.remove("running");
-        outputs.status.textContent = `${scenarioLabels[params.scenario]} complete. Final classification: ${normalizeClassification(result.classification)}.`;
+        try {
+          const result = runSimulation(params);
+          if (runId !== activeRunId) return;
+          updateSummary(result);
+          updateFindings(result);
+          updatePolicy(result);
+          plotResults(result);
+          outputs.status.textContent = `${scenarioLabels[params.scenario]} complete. Final classification: ${normalizeClassification(result.classification)}.`;
+        } catch (error) {
+          if (runId !== activeRunId) return;
+          outputs.status.textContent = "The simulation could not finish. Check the browser console for details.";
+          console.error(error);
+        } finally {
+          if (runId !== activeRunId) return;
+          outputs.progressBar.classList.remove("running");
+          outputs.runButton.disabled = false;
+        }
       }, 20);
     }
 
@@ -1610,7 +1632,7 @@
       controls.citizens.value = 100;
       controls.influencers.value = 5;
       controls.experts.value = 3;
-      controls.steps.value = 75;
+      controls.steps.value = 100;
       applyScenarioDefaults();
       setPlotTab("all");
       runModel();

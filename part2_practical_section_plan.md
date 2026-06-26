@@ -89,7 +89,7 @@ Suggested network settings:
 - Citizens: `N = 100`
 - Influencers: `I = 5`
 - Experts: `E = 3`
-- Time steps: `T = 75`
+- Time steps: `T = 100`
 - Initial citizen opinions: random values from `[-1, +1]`
 
 These values are inside the assignment requirements and are manageable for coding, plotting, and analysis.
@@ -364,7 +364,7 @@ T_ce = N x E citizen trust toward experts
   - `N = 100` citizens
   - `I = 5` influencers
   - `E = 3` education experts
-  - `time_steps = 75`
+  - `time_steps = 100`
   - Citizen opinions randomly between `-1` and `+1`
   - Influencer opinions using stronger values, for example some near `+0.8` and some near `-0.8`
   - Expert opinions near neutral or moderately supportive, for example `0.2` to `0.5`
