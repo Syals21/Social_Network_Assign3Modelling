@@ -6,6 +6,6 @@
 - [ ] HTML GUI completed.
 - [ ] Required plots displayed in Octave or saved as screenshots/images.
 - [ ] Scenario analysis completed.
-- [ ] Final report completed.
+- [x] Final report completed.
 - [ ] Final folder checked before submission.
 
