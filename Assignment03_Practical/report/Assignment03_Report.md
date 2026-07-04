@@ -128,11 +128,12 @@ scenario condition rather than random setup differences.
 | Strong Expert | 0.373 | 0.094 | Consensus |
 | Low Trust | 0.134 | 0.094 | Mixed / Neutral |
 
-*(See `results/*_graphs.png` for the full 2D average-opinion, 2D individual-opinion,
-3D temporal, and histogram plots for each scenario, generated directly by the
-Octave scripts in `code/`.)*
+*(Full-size versions of all graphs below are saved in `results/*_graphs.png`,
+generated directly by the Octave scripts in `code/`.)*
 
 ### 4.1 Baseline
+
+![Baseline scenario graphs](../results/baseline_graphs.png)
 
 Opinions rise gradually from a random start toward a mild positive lean
 (mean ≈ 0.25) and settle within ~20–30 time steps. The final histogram is a
@@ -142,6 +143,8 @@ was classified as "mixed/neutral" rather than full consensus because the
 spread (std = 0.177) was still too wide to count as tight agreement.
 
 ### 4.2 Strong Influencer
+
+![Strong Influencer scenario graphs](../results/strong_influencer_graphs.png)
 
 The individual-opinion plot visibly splits into several parallel bands
 instead of one converging line — some citizens cluster near +0.8, others
@@ -156,6 +159,8 @@ just two camps.
 
 ### 4.3 Strong Expert
 
+![Strong Expert scenario graphs](../results/strong_expert_graphs.png)
+
 This scenario produced the tightest final distribution of all four (std =
 0.094) and the highest final mean opinion (0.373). The individual-opinion
 plot shows nearly all citizen lines converging into a narrow band by around
@@ -165,6 +170,8 @@ supportive stance, confirming the theoretical expectation that credible,
 evidence-based sources stabilize public opinion and reduce variance.
 
 ### 4.4 Low Trust
+
+![Low Trust scenario graphs](../results/low_trust_graphs.png)
 
 Contrary to the intuitive expectation that low trust would cause
 fragmentation, this scenario produced the *lowest* combined spread alongside
